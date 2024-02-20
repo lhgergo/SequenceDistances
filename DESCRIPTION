@@ -3,7 +3,7 @@ Type: Package
 Title: An R library providing fast, Rcpp-based functions for calculating sequence similarities and distances.
 Version: 0.1
 Date: 2024-02-08
-Author: Gergő Balogh
+Author: Gergo Balogh
 Maintainer: Gergo Balogh <gmbalogh@brc.hu>
 Description: This R package contains functions written in Rcpp providing fast tools to calculate either sequence similarities or distances
 License: GPL (>= 2)
