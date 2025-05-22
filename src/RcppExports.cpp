@@ -22,9 +22,22 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// BLOSUM62sim
+NumericMatrix BLOSUM62sim(StringVector peptides1, StringVector peptides2);
+RcppExport SEXP _SequenceDistances_BLOSUM62sim(SEXP peptides1SEXP, SEXP peptides2SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< StringVector >::type peptides1(peptides1SEXP);
+    Rcpp::traits::input_parameter< StringVector >::type peptides2(peptides2SEXP);
+    rcpp_result_gen = Rcpp::wrap(BLOSUM62sim(peptides1, peptides2));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_SequenceDistances_GranthamDistance", (DL_FUNC) &_SequenceDistances_GranthamDistance, 2},
+    {"_SequenceDistances_BLOSUM62sim", (DL_FUNC) &_SequenceDistances_BLOSUM62sim, 2},
     {NULL, NULL, 0}
 };
 

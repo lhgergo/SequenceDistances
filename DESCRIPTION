@@ -8,4 +8,4 @@ Maintainer: Gergo Balogh <gmbalogh@brc.hu>
 Description: This R package contains functions written in Rcpp providing fast tools to calculate either sequence similarities or distances
 License: GPL (>= 2)
 Imports: Rcpp (>= 1.0.11)
-LinkingTo: Rcpp
+LinkingTo: Rcpp, RcppParallel

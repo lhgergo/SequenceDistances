@@ -5,3 +5,7 @@ GranthamDistance <- function(peptides1, peptides2) {
     .Call(`_SequenceDistances_GranthamDistance`, peptides1, peptides2)
 }
 
+BLOSUM62sim <- function(peptides1, peptides2) {
+    .Call(`_SequenceDistances_BLOSUM62sim`, peptides1, peptides2)
+}
+

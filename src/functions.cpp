@@ -1,5 +1,8 @@
 #include <Rcpp.h>
+#include <RcppParallel.h>
+
 using namespace Rcpp;
+using namespace RcppParallel;
 
 // Function to transcode one amino acid to a corresponding number
 int findLetterPosition(char target) {
@@ -73,11 +76,73 @@ NumericMatrix GranthamDistance(StringVector peptides1, StringVector peptides2) {
       for (int k = 0; k < seq1_vec.size() && k < seq2_vec.size(); ++k) {
         distance += grantham_distance(seq1_vec[k], seq2_vec[k]);
       }
-
+      
       // Store the calculated distance
       distances(i, j) = distance;
     }
   }
   
   return distances;
+}
+
+#include <Rcpp.h>
+using namespace Rcpp;
+
+// Function to calculate BLOSUM62 similarity between two amino acids
+int blosum62_similarity(char aa1, char aa2) {
+  int blosum62[20][20] = {{4, 0, -2, -1, -2, 0, -2, -1, -1, -1, -1, -2, -1, -1, -1, 1, 0, 0, -3, -2},
+                          {0, 9, -3, -4, -2, -3, -3, -1, -3, -1, -1, -3, -3, -3, -3, -1, -1, -1, -2, -2},
+                          {-2, -3, 6, 2, -3, -1, -1, -3, -1, -4, -3, 1, -1, 0, -2, 0, -1, -3, -4, -3},
+                          {-1, -4, 2, 5, -3, -2, 0, -3, 1, -3, -2, 0, -1, 2, 0, 0, -1, -2, -3, -2},
+                          {-2, -2, -3, -3, 6, -3, -1, 0, -3, 0, 0, -3, -4, -3, -3, -2, -2, -1, 1, 3},
+                          {0, -3, -1, -2, -3, 6, -2, -4, -2, -4, -3, 0, -2, -2, -2, 0, -2, -3, -2, -3},
+                          {-2, -3, -1, 0, -1, -2, 8, -3, -1, -3, -2, 1, -2, 0, 0, -1, -2, -3, -2, 2},
+                          {-1, -1, -3, -3, 0, -4, -3, 4, -3, 2, 1, -3, -3, -3, -3, -2, -1, 3, -3, -1},
+                          {-1, -3, -1, 1, -3, -2, -1, -3, 5, -2, -1, 0, -1, 1, 2, 0, -1, -2, -3, -2},
+                          {-1, -1, -4, -3, 0, -4, -3, 2, -2, 4, 2, -3, -3, -2, -2, -2, -1, 1, -2, -1},
+                          {-1, -1, -3, -2, 0, -3, -2, 1, -1, 2, 5, -2, -2, 0, -1, -1, -1, 1, -1, -1},
+                          {-2, -3, 1, 0, -3, 0, 1, -3, 0, -3, -2, 6, -2, 0, 0, 1, 0, -3, -4, -2},
+                          {-1, -3, -1, -1, -4, -2, -2, -3, -1, -3, -2, -2, 7, -1, -2, -1, -1, -2, -4, -3},
+                          {-1, -3, 0, 2, -3, -2, 0, -3, 1, -2, 0, 0, -1, 5, 1, 0, -1, -2, -2, -1},
+                          {-1, -3, -2, 0, -3, -2, 0, -3, 2, -2, -1, 0, -2, 1, 5, -1, -1, -3, -3, -2},
+                          {1, -1, 0, 0, -2, 0, -1, -2, 0, -2, -1, 1, -1, 0, -1, 4, 1, -2, -3, -2},
+                          {0, -1, -1, -1, -2, -2, -2, -1, -1, -1, -1, 0, -1, -1, -1, 1, 5, 0, -2, -2},
+                          {0, -1, -3, -2, -1, -3, -3, 3, -2, 1, 1, -3, -2, -2, -3, -2, 0, 4, -3, -1},
+                          {-3, -2, -4, -3, 1, -2, -2, -3, -3, -2, -1, -4, -4, -2, -3, -3, -2, -3, 11, 2},
+                          {-2, -2, -3, -2, 3, -3, 2, -1, -2, -1, -1, -2, -3, -1, -2, -2, -2, -1, 2, 7}};
+  int pos1 = findLetterPosition(aa1);
+  int pos2 = findLetterPosition(aa2);
+  if (pos1 == -1 || pos2 == -1) return -999;
+  return blosum62[pos1][pos2];
+}
+
+
+// Function to calculate BLOSUM62 similarities between two sets of peptides
+// [[Rcpp::export]]
+NumericMatrix BLOSUM62sim(StringVector peptides1, StringVector peptides2) {
+  int n1 = peptides1.size();
+  int n2 = peptides2.size();
+  
+  NumericMatrix similarities(n1, n2);
+  
+  for (int i = 0; i < n1; ++i) {
+    for (int j = 0; j < n2; ++j) {
+      // Get peptide sequences as strings
+      std::vector<char> seq1_vec;
+      std::vector<char> seq2_vec;
+      seq1_vec.insert(seq1_vec.end(), peptides1[i].begin(), peptides1[i].end());
+      seq2_vec.insert(seq2_vec.end(), peptides2[j].begin(), peptides2[j].end());
+      
+      // Calculate Grantham similarity for each pair of amino acids in the sequences
+      int similarity = 0;
+      for (int k = 0; k < seq1_vec.size() && k < seq2_vec.size(); ++k) {
+        similarity += blosum62_similarity(seq1_vec[k], seq2_vec[k]);
+      }
+      
+      // Store the calculated similarity
+      similarities(i, j) = similarity;
+    }
+  }
+  
+  return similarities;
 }

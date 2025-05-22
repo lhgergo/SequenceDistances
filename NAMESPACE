@@ -1,3 +1,4 @@
 useDynLib(SequenceDistances, .registration=TRUE)
 importFrom(Rcpp, evalCpp)
+importFrom(RcppParallel, RcppParallelLibs)
 exportPattern("^[[:alpha:]]+")
